@@ -1,7 +1,7 @@
 {
-  "name": "Fast pari",
-  "short_name": "Fast pari",
-  "description": "Fast pari",
+  "name": "Fastpari",
+  "short_name": "Fastpari",
+  "description": "Fastpari",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",

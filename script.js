@@ -3,9 +3,10 @@ const STORE_NAME = "videos";
 const VIDEO_KEY = "currentVideo";
 
 const player = document.getElementById("player");
+const controls = document.getElementById("controls");
 const addBtn = document.getElementById("addBtn");
+const deleteBtn = document.getElementById("deleteBtn");
 const fileInput = document.getElementById("fileInput");
-
 let hideTimer = null;
 
 // ---------- IndexedDB helpers ----------
@@ -25,6 +26,15 @@ async function saveVideo(blob) {
   return new Promise((resolve, reject) => {
     const tx = db.transaction(STORE_NAME, "readwrite");
     tx.objectStore(STORE_NAME).put(blob, VIDEO_KEY);
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  });
+}
+async function deleteVideoFromDB() {
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE_NAME, "readwrite");
+    tx.objectStore(STORE_NAME).delete(VIDEO_KEY);
     tx.oncomplete = () => resolve();
     tx.onerror = () => reject(tx.error);
   });
@@ -53,7 +63,7 @@ function playBlob(blob) {
 }
 
 function showAddButton() {
-  addBtn.classList.remove("hidden");
+  controls.classList.remove("hidden");
   clearTimeout(hideTimer);
   if (player.classList.contains("active")) {
     hideTimer = setTimeout(hideAddButton, 3000);
@@ -61,11 +71,22 @@ function showAddButton() {
 }
 
 function hideAddButton() {
-  addBtn.classList.add("hidden");
+  controls.classList.add("hidden");
 }
-
 addBtn.addEventListener("click", () => {
   fileInput.click();
+});
+deleteBtn.addEventListener("click", async () => {
+  await deleteVideoFromDB();
+  player.pause();
+  if (player.src) {
+    URL.revokeObjectURL(player.src);
+  }
+  player.removeAttribute("src");
+  player.load();
+  player.classList.remove("active");
+  clearTimeout(hideTimer);
+  showAddButton();
 });
 
 fileInput.addEventListener("change", async (e) => {
@@ -79,7 +100,7 @@ fileInput.addEventListener("change", async (e) => {
 // tap on the video briefly reveals the add button so the user
 // can swap the video later without the app looking like a player
 player.addEventListener("click", () => {
-  if (addBtn.classList.contains("hidden")) {
+  if (controls.classList.contains("hidden")) {
     showAddButton();
   } else {
     hideAddButton();

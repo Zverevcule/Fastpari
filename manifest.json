@@ -1,7 +1,7 @@
 {
-  "name": "1xbet",
-  "short_name": "1xbet",
-  "description": "1xbet",
+  "name": "Fast pari",
+  "short_name": "Fast pari",
+  "description": "Fast pari",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
